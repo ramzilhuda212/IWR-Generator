@@ -550,6 +550,7 @@
         }
 
         function generateAll() {
+            const jenjang = document.getElementById('jenjang').value;
             const kelasId = document.getElementById('kelas').value;
             const namaSekolah = document.getElementById('namaSekolah').value;
             const tahunAjaran = document.getElementById('tahunAjaran').value;
@@ -568,11 +569,10 @@
             let durasiInti = durasiTotal - durasiAwal - durasiPenutup;
             if (durasiInti < 0) durasiInti = 0;
 
-            // PEMBAGIAN DURASI INTI KEPADA SUB-KEGIATAN INTI
-            const durasiIntiAdab = Math.round(durasiInti * 0.15); // ~15%
-            const durasiIceBreak = Math.round(durasiInti * 0.08); // ~8%
-            const durasiIntiHafalan = Math.round(durasiInti * 0.37); // ~37%
-            const durasiIntiBacaan = durasiInti - durasiIntiAdab - durasiIceBreak - durasiIntiHafalan; // sisa ~40%
+            const durasiIntiAdab = Math.round(durasiInti * 0.15);
+            const durasiIceBreak = Math.round(durasiInti * 0.08);
+            const durasiIntiHafalan = Math.round(durasiInti * 0.37);
+            const durasiIntiBacaan = durasiInti - durasiIntiAdab - durasiIceBreak - durasiIntiHafalan;
 
             const cp = DATA_CP_IWR[kelasId] || DATA_CP_IWR["SD_1"];
             const kelasSelect = document.getElementById('kelas');
@@ -773,6 +773,8 @@
                     </div>
                 `;
             } else if (currentTab === 'rph') {
+                const isSMP = jenjang === 'SMP' || jenjang === 'SMA';
+                
                 container.innerHTML = `
                     ${renderDocumentHeader(
                         "RENCANA PENGAJARAN HARIAN (RPH)", 
@@ -780,135 +782,299 @@
                         `${namaSekolah} | Tahun Pelajaran ${tahunAjaran} \vert{} Semester${semester}`
                     )}
 
+                    <!-- BAGIAN I. IDENTITAS RPH -->
                     <div class="mb-6">
-                        <h4 class="font-bold text-sm bg-green-100 text-green-900 px-3 py-1.5 rounded mb-3 border-l-4 border-jsit flex justify-between items-center">
-                            <span>BAGIAN I. IDENTITAS RPH</span>
-                            <span class="text-xs bg-jsit text-white px-2 py-0.5 rounded font-normal">Total Durasi: ${durasiTotal} Menit</span>
-                        </h4>
+                        <h3 class="text-base font-bold text-[#277838] mb-2 flex items-center gap-1">
+                            Bagian I. Identitas RPH
+                        </h3>
                         <table class="w-full text-xs border-collapse border border-gray-300">
-                            <tr><td class="p-2 border font-semibold bg-gray-50 w-1/3">Satuan Pendidikan</td><td class="p-2 border">${namaSekolah}</td></tr>
-                            <tr><td class="p-2 border font-semibold bg-gray-50">Kelas / Jenjang / Fase</td><td class="p-2 border">${kelasText} (${cp.fase})</td></tr>
-                            <tr><td class="p-2 border font-semibold bg-gray-50">Alokasi Waktu Pertemuan</td><td class="p-2 border font-bold text-green-900">${durasiTotal} Menit (1 Pertemuan)</td></tr>
-                            <tr><td class="p-2 border font-semibold bg-gray-50">Rincian Pembagian Waktu</td><td class="p-2 border font-medium">Pembukaan: <strong>${durasiAwal} Menit</strong> | Kegiatan Inti: <strong>${durasiInti} Menit</strong> | Penutupan: <strong>${durasiPenutup} Menit</strong></td></tr>
-                            <tr><td class="p-2 border font-semibold bg-gray-50">Jumlah Peserta Didik</td><td class="p-2 border">${cp.jumlah_murid} per kelompok/halaqah</td></tr>
-                            <tr><td class="p-2 border font-semibold bg-gray-50">Guru Pengajar</td><td class="p-2 border">${namaGuru}</td></tr>
-                            <tr><td class="p-2 border font-semibold bg-gray-50">Integrasi Pendekatan 7T</td><td class="p-2 border font-bold text-jsit">Tahsin, Tilawah, Tahfizh, Tafsir, Tadabbur, Tathbiq, Ta'allama wa 'Allama</td></tr>
+                            <thead>
+                                <tr class="bg-[#277838] text-white font-bold">
+                                    <th class="border border-gray-300 p-2 text-left w-1/3">Komponen</th>
+                                    <th class="border border-gray-300 p-2 text-left w-2/3">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#f4f8f3]">Judul Modul Ajar</td>
+                                    <td class="border border-gray-300 p-2">${materiJilidRph.includes('Jilid') ? materiJilidRph : 'Tahsin, Tahfizh, dan Tadabbur Al-Qur\'an'} Metode Ilman Wa Ruuhan – ${kelasText}</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#f4f8f3]">Mata Pelajaran</td>
+                                    <td class="border border-gray-300 p-2">Al-Qur'an</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#f4f8f3]">Kelas / Jenjang</td>
+                                    <td class="border border-gray-300 p-2">${kelasText} (${cp.fase})</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#f4f8f3]">Alokasi Waktu</td>
+                                    <td class="border border-gray-300 p-2 font-semibold text-green-900">${durasiTotal} menit (1 Pertemuan)</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#f4f8f3]">Model Pembelajaran</td>
+                                    <td class="border border-gray-300 p-2">Tatap Muka (${isSMP ? 'halaqah' : 'klasikal & individual'})</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#f4f8f3]">Jumlah Peserta Didik</td>
+                                    <td class="border border-gray-300 p-2">${cp.jumlah_murid} per ${isSMP ? 'halaqah' : 'kelompok'}</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#f4f8f3]">Sarana dan Prasarana</td>
+                                    <td class="border border-gray-300 p-2">Ruang kelas/musala, mushaf Al-Qur'an, ${materiJilidRph.includes('Jilid') ? 'buku jilid IWR, ' : ''}buku tafsir/terjemah, papan tulis, serta buku mutaba'ah</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#f4f8f3]">Target Peserta Didik</td>
+                                    <td class="border border-gray-300 p-2">Peserta didik reguler ${kelasText}</td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
 
+                    <!-- BAGIAN II. CAPAIAN PEMBELAJARAN -->
                     <div class="mb-6">
-                        <h4 class="font-bold text-sm bg-green-100 text-green-900 px-3 py-1.5 rounded mb-3 border-l-4 border-jsit">BAGIAN II. CAPAIAN PEMBELAJARAN SESUAI DOKUMEN CP IWR 2026</h4>
+                        <h3 class="text-base font-bold text-[#277838] mb-2 flex items-center gap-1">
+                            Bagian II. Capaian Pembelajaran
+                        </h3>
                         <table class="w-full text-xs border-collapse border border-gray-300">
-                            <tr class="bg-gray-50"><th class="border p-2 w-1/4">Aspek</th><th class="border p-2 w-1/2">Capaian Pembelajaran (CP Dokumen Resmi)</th><th class="border p-2 w-1/4">Target Pertemuan Ini</th></tr>
-                            <tr><td class="border p-2 font-bold text-green-900">Adab dan Santun</td><td class="border p-2">${cp.santun_taat}</td><td class="border p-2 font-semibold text-jsit">Mempraktikkan adab membawa/meletakkan mushaf & mutaba'ah harian.</td></tr>
-                            <tr><td class="border p-2 font-bold text-green-900">Hafalan (Tahfizh Ziadah & Muroja'ah)</td><td class="border p-2">${cp.fasih_menghafal}</td><td class="border p-2 font-semibold text-jsit">Menghafal & melafalkan ${materiZiadahRph} dengan tartil serta Muroja'ah.</td></tr>
-                            <tr><td class="border p-2 font-bold text-green-900">Kandungan Surat</td><td class="border p-2">${cp.fasih_memahami}</td><td class="border p-2 font-semibold text-jsit">Menjelaskan arti nama surat & pesan moral harian.</td></tr>
-                            <tr><td class="border p-2 font-bold text-green-900">Bacaan (Jilid/Tilawah)</td><td class="border p-2">${cp.fasih_membaca}</td><td class="border p-2 font-semibold text-jsit">Melafalkan materi ${materiJilidRph} sesuai tajwid.</td></tr>
+                            <thead>
+                                <tr class="bg-[#277838] text-white font-bold">
+                                    <th class="border border-gray-300 p-2 text-left w-1/5">Aspek</th>
+                                    <th class="border border-gray-300 p-2 text-left w-2/5">Capaian Pembelajaran</th>
+                                    <th class="border border-gray-300 p-2 text-left w-2/5">Target Pertemuan Ini</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#eaf3fa] text-gray-900">Adab dan Santun</td>
+                                    <td class="border border-gray-300 p-2">${cp.santun_taat}<br>2.1. Terbiasa membawa dan meletakkan Al-Qur'an/Jilid dengan benar.</td>
+                                    <td class="border border-gray-300 p-2">Peserta didik menyampaikan/melaporkan pelaksanaan jadwal mengulang di rumah serta mempraktikkan cara membawa dan meletakkan Al-Qur'an atau buku jilid dengan benar.</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#eaf3fa] text-gray-900">Hafalan</td>
+                                    <td class="border border-gray-300 p-2">${cp.fasih_menghafal}</td>
+                                    <td class="border border-gray-300 p-2">Peserta didik menirukan dan mulai menghafal ${materiZiadahRph} dengan baik dan benar.</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#eaf3fa] text-gray-900">${isSMP ? 'Pemahaman Makna' : 'Kandungan Surat'}</td>
+                                    <td class="border border-gray-300 p-2">${cp.fasih_memahami}</td>
+                                    <td class="border border-gray-300 p-2">Peserta didik menyebutkan arti nama surat dan jumlah ayatnya serta mengambil hikmah harian.</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#eaf3fa] text-gray-900">${isSMP ? 'Tilawah dan Tajwid' : 'Materi Jilid / Bacaan'}</td>
+                                    <td class="border border-gray-300 p-2">${cp.fasih_membaca}</td>
+                                    <td class="border border-gray-300 p-2">Peserta didik melafalkan bunyi bacaan ${materiJilidRph} dengan tepat dan tajwid yang benar.</td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
 
+                    <!-- BAGIAN III. PROFIL PELAJAR IWR -->
                     <div class="mb-6">
-                        <h4 class="font-bold text-sm bg-green-100 text-green-900 px-3 py-1.5 rounded mb-3 border-l-4 border-jsit">BAGIAN III. LANGKAH-LANGKAH PEMBELAJARAN (RINCIAN DURASI WAKTU FLEKSIBEL)</h4>
-                        
+                        <h3 class="text-base font-bold text-[#277838] mb-2">
+                            Bagian III. Profil Pelajar IWR
+                        </h3>
+                        <ul class="list-disc list-inside text-xs text-gray-800 space-y-1 pl-1 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <li><span class="font-bold">Taat kepada Allah</span> – <span class="font-bold">Memuliakan Al-Qur'an</span> – <span class="font-bold">Beradab terhadap Sesama</span></li>
+                            <li><span class="font-bold">Bacaan sesuai Tajwid</span> – <span class="font-bold">Hafalan sesuai Target</span> – <span class="font-bold">Memahami Makna Surat dan Ayat</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- BAGIAN IV. LANGKAH-LANGKAH PEMBELAJARAN (7 LANGKAH) -->
+                    <div class="mb-6">
+                        <h3 class="text-base font-bold text-[#277838] mb-3">
+                            Bagian IV. Langkah-Langkah Pembelajaran (7 Langkah)
+                        </h3>
+
                         <div class="space-y-4 text-xs">
-                            <!-- TAHAP PEMBUKAAN -->
-                            <div class="border p-3 rounded-lg bg-green-50/50">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="font-bold text-jsit uppercase">A. TAHAP PEMBUKAAN (KESIAPAN SPIRITUAL & ADAB)</span>
-                                    <span class="bg-green-700 text-white px-2 py-0.5 rounded text-[11px] font-bold">${durasiAwal} Menit</span>
+                            
+                            <!-- Langkah 1: Pembukaan -->
+                            <div class="border border-gray-300 rounded-lg overflow-hidden flex flex-col sm:flex-row">
+                                <div class="bg-[#1d68be] text-white p-3 sm:w-40 flex flex-col justify-center items-center text-center font-bold shrink-0">
+                                    <span class="text-sm">Langkah 1</span>
+                                    <span class="text-base">Pembukaan</span>
+                                    <span class="text-xs font-normal italic mt-1">${durasiAwal} menit</span>
                                 </div>
-                                <p class="mt-1">Pendidik mengucapkan salam, menanyakan kabar, memastikan kesiapan (wudhu & mushaf). Memimpin syahadat & selawat, membaca Surah Al-Fatihah dan Doa Penawar Hati bersama, serta melakukan ice breaking singkat Kesiapan Belajar.</p>
-                            </div>
-
-                            <!-- TAHAP INTI -->
-                            <div class="border p-3 rounded-lg border-green-300">
-                                <div class="flex justify-between items-center mb-2 pb-1 border-b">
-                                    <span class="font-bold text-green-900 uppercase">B. TAHAP KEGIATAN INTI (7 LANGKAH TALAQQI & ADAB)</span>
-                                    <span class="bg-green-800 text-white px-2.5 py-0.5 rounded text-[11px] font-bold">Total Inti: ${durasiInti} Menit</span>
-                                </div>
-
-                                <div class="space-y-3 pl-2">
-                                    <div class="bg-gray-50 p-2 rounded border">
-                                        <div class="flex justify-between items-center font-bold text-jsit">
-                                            <span>Sub-Langkah 1: Inti Capaian Santun (7 Langkah Adab)</span>
-                                            <span class="text-xs bg-green-100 text-green-900 px-2 py-0.5 rounded">${durasiIntiAdab} Menit</span>
-                                        </div>
-                                        <ol class="list-decimal list-inside space-y-1 text-gray-700 mt-1 pl-1">
-                                            <li><strong>Pengulangan:</strong> Pendidik mengonfirmasi komitmen adab santun harian.</li>
-                                            <li><strong>Mencontohkan & Ditirukan:</strong> Pendidik mencontohkan cara membawa/meletakkan mushaf. Murid menirukan.</li>
-                                            <li><strong>Menjelaskan:</strong> Pendidik menjelaskan hikmah memuliakan Al-Qur'an.</li>
-                                            <li><strong>Menunjuk Sebagian:</strong> Menunjuk sebagian murid mempraktikkan adab santun.</li>
-                                            <li><strong>Membaca/Praktik Berkelompok:</strong> Meminta kelompok mempraktikkan secara bergantian.</li>
-                                            <li><strong>Membaca/Praktik Bersama:</strong> Seluruh peserta didik mempraktikkan bersama-sama.</li>
-                                            <li><strong>Menilai:</strong> Peserta didik mempraktikkan satu per satu; pendidik mencatat di jurnal sikap.</li>
-                                        </ol>
+                                <div class="flex-1">
+                                    <div class="bg-[#e8f1fb] text-[#1d68be] font-bold px-3 py-1.5 border-b border-gray-200">
+                                        Aktivitas
                                     </div>
-
-                                    <div class="bg-gray-50 p-2 rounded border">
-                                        <div class="flex justify-between items-center font-bold text-jsit">
-                                            <span>Sub-Langkah 2: Energizer / Ice Breaking & Re-fokus</span>
-                                            <span class="text-xs bg-green-100 text-green-900 px-2 py-0.5 rounded">${durasiIceBreak} Menit</span>
-                                        </div>
-                                        <p class="mt-1 text-gray-700">Tepuk IWR & Yel-Yel Pecinta Qur'an untuk menyegarkan fokus peserta didik sebelum masuk materi hafalan & jilid.</p>
-                                    </div>
-
-                                    <div class="bg-gray-50 p-2 rounded border">
-                                        <div class="flex justify-between items-center font-bold text-jsit">
-                                            <span>Sub-Langkah 3: Inti Hafalan (7 Langkah Tahfizh Ziadah & Muroja'ah: ${materiZiadahRph})</span>
-                                            <span class="text-xs bg-green-100 text-green-900 px-2 py-0.5 rounded">${durasiIntiHafalan} Menit</span>
-                                        </div>
-                                        <ol class="list-decimal list-inside space-y-1 text-gray-700 mt-1 pl-1">
-                                            <li><strong>Mengulang:</strong> Muroja'ah bersama hafalan ayat/surat sebelumnya.</li>
-                                            <li><strong>Mencontohkan & Ditirukan:</strong> Pendidik membacakan ayat baru ${materiZiadahRph} minimal 3x dengan tartil. Murid menyimak & menirukan.</li>
-                                            <li><strong>Menjelaskan:</strong> Pendidik menjelaskan arti kata, jumlah ayat, dan kandungan singkat.</li>
-                                            <li><strong>Menunjuk Sebagian:</strong> Menunjuk sebagian murid melafalkan ayat baru.</li>
-                                            <li><strong>Membaca Berkelompok:</strong> Melafalkan ayat baru secara berkelompok.</li>
-                                            <li><strong>Membaca Bersama:</strong> Seluruh murid melafalkan ayat baru bersama-sama.</li>
-                                            <li><strong>Menilai:</strong> Menyimak setoran hafalan baru murid secara individual/bergiliran.</li>
-                                        </ol>
-                                    </div>
-
-                                    <div class="bg-gray-50 p-2 rounded border">
-                                        <div class="flex justify-between items-center font-bold text-jsit">
-                                            <span>Sub-Langkah 4: Inti Bacaan Jilid / Tilawah / Tajwid (7 Langkah Bacaan: ${materiJilidRph})</span>
-                                            <span class="text-xs bg-green-100 text-green-900 px-2 py-0.5 rounded">${durasiIntiBacaan} Menit</span>
-                                        </div>
-                                        <ol class="list-decimal list-inside space-y-1 text-gray-700 mt-1 pl-1">
-                                            <li><strong>Mengulang:</strong> Mengulang materi 3-5 halaman sebelumnya.</li>
-                                            <li><strong>Mencontohkan & Ditirukan:</strong> Pendidik mencontohkan bunyi pokok materi di alat peraga/mushaf 3x, murid menirukan.</li>
-                                            <li><strong>Menjelaskan:</strong> Pendidik menjelaskan hukum tajwid/harakat dengan kata kunci ringkas.</li>
-                                            <li><strong>Menunjuk Sebagian:</strong> Menunjuk murid secara individu membaca baris yang ditunjuk.</li>
-                                            <li><strong>Membaca Berkelompok:</strong> Membaca baris latihan berkelompok.</li>
-                                            <li><strong>Membaca Bersama:</strong> Membaca satu halaman peraga/tilawah penuh secara bersama.</li>
-                                            <li><strong>Menilai:</strong> Pendidik menyimak dan menilai bacaan murid secara individual.</li>
-                                        </ol>
-                                    </div>
+                                    <ol class="list-decimal list-inside p-3 space-y-1.5 text-gray-800 bg-white">
+                                        <li>Pendidik mengucapkan salam dan menanyakan kabar peserta didik.</li>
+                                        <li>Pendidik memimpin bacaan syahadat dan selawat bersama-sama.</li>
+                                        <li>Pendidik dan peserta didik membaca Surah Al-Fatihah dan Doa Penawar Hati (Doa Sebelum Belajar Al-Qur'an) bersama-sama.</li>
+                                        <li>Pendidik melaksanakan ice breaking: pendidik membacakan penggalan ayat pendek, lalu peserta didik melanjutkannya (tebak/lanjut ayat).</li>
+                                    </ol>
                                 </div>
                             </div>
 
-                            <!-- TAHAP PENUTUPAN -->
-                            <div class="border p-3 rounded-lg bg-green-50/50">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="font-bold text-jsit uppercase">C. TAHAP PENUTUPAN (REFLEKSI, MUTABA'AH & DOA)</span>
-                                    <span class="bg-green-700 text-white px-2 py-0.5 rounded text-[11px] font-bold">${durasiPenutup} Menit</span>
+                            <!-- Langkah 2: Adab dan Santun -->
+                            <div class="border border-gray-300 rounded-lg overflow-hidden flex flex-col sm:flex-row">
+                                <div class="bg-[#6b21a8] text-white p-3 sm:w-40 flex flex-col justify-center items-center text-center font-bold shrink-0">
+                                    <span class="text-sm">Langkah 2</span>
+                                    <span class="text-base">Adab dan Santun</span>
+                                    <span class="text-xs font-normal italic mt-1">${durasiIntiAdab} menit</span>
                                 </div>
-                                <p class="mt-1">Muroja'ah bersama kesimpulan hafalan & jilid hari ini, memberikan penugasan membuat jadwal muroja'ah di rumah bersama orang tua, membaca Doa Kaffaratul Majlis bersama, dan salam penutup.</p>
+                                <div class="flex-1">
+                                    <div class="bg-[#f3e8ff] text-[#6b21a8] font-bold px-3 py-1.5 border-b border-gray-200">
+                                        Aktivitas
+                                    </div>
+                                    <ol class="list-decimal list-inside p-3 space-y-1.5 text-gray-800 bg-white">
+                                        <li>Pendidik menanyakan kepada peserta didik apakah di rumah sudah mengulang hafalan dan materi jilid/tilawah sesuai jadwal yang telah dibuat.</li>
+                                        <li>Pendidik mencontohkan cara membawa Al-Qur'an atau buku jilid dengan benar: dibawa dengan tangan kanan, didekap di dada, dan disimpan di tempat yang tinggi. Peserta didik menirukannya.</li>
+                                        <li>Pendidik menjelaskan secara sederhana alasan Al-Qur'an harus dimuliakan, yaitu karena Al-Qur'an adalah kalam Allah.</li>
+                                        <li>Pendidik menunjuk sebagian peserta didik untuk mempraktikkan cara membawa Al-Qur'an atau buku jilidnya.</li>
+                                        <li>Pendidik meminta setiap kelompok untuk mempraktikkan cara membawa Al-Qur'an atau buku jilidnya secara bergantian.</li>
+                                        <li>Pendidik meminta seluruh peserta didik mempraktikkan cara membawa Al-Qur'an bersama-sama.</li>
+                                        <li>Peserta didik mempraktikkan cara membawa Al-Qur'an satu per satu sesuai contoh yang diberikan.</li>
+                                    </ol>
+                                </div>
                             </div>
+
+                            <!-- Langkah 3: Energizer -->
+                            <div class="border border-gray-300 rounded-lg overflow-hidden flex flex-col sm:flex-row">
+                                <div class="bg-[#d94e16] text-white p-3 sm:w-40 flex flex-col justify-center items-center text-center font-bold shrink-0">
+                                    <span class="text-sm">Langkah 3</span>
+                                    <span class="text-base">Energizer</span>
+                                    <span class="text-xs font-normal italic mt-1">${durasiIceBreak} menit</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="bg-[#fff3e0] text-[#d94e16] font-bold px-3 py-1.5 border-b border-gray-200">
+                                        Aktivitas
+                                    </div>
+                                    <ol class="list-decimal list-inside p-3 space-y-1.5 text-gray-800 bg-white">
+                                        <li>Pendidik memimpin Tepuk IWR bersama-sama.</li>
+                                        <li>Pendidik memimpin Yel-Yel IWR untuk menyegarkan semangat peserta didik.</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <!-- Langkah 4: Hafalan -->
+                            <div class="border border-gray-300 rounded-lg overflow-hidden flex flex-col sm:flex-row">
+                                <div class="bg-[#1b7a37] text-white p-3 sm:w-40 flex flex-col justify-center items-center text-center font-bold shrink-0">
+                                    <span class="text-sm">Langkah 4</span>
+                                    <span class="text-base">Hafalan</span>
+                                    <span class="text-xs font-normal italic mt-1">${durasiIntiHafalan} menit</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="bg-[#e8f5e9] text-[#1b7a37] font-bold px-3 py-1.5 border-b border-gray-200">
+                                        Aktivitas
+                                    </div>
+                                    <ol class="list-decimal list-inside p-3 space-y-1.5 text-gray-800 bg-white">
+                                        <li>Peserta didik membaca bersama-sama hafalan sebelumnya (${cp.murojaah_base}) sebagai pengulangan.</li>
+                                        <li>Pendidik membacakan materi ziadah (${materiZiadahRph}) dengan tartil, lalu peserta didik menirukannya.</li>
+                                        <li>Pendidik menjelaskan arti nama surat dan jumlah ayat materi hafalan hari ini.</li>
+                                        <li>Pendidik menunjuk beberapa peserta didik melafalkan hafalan baru.</li>
+                                        <li>Peserta didik melafalkan materi hafalan baru secara berkelompok.</li>
+                                        <li>Seluruh peserta didik melafalkan hafalan baru secara bersama-sama.</li>
+                                        <li>Peserta didik menyetorkan hafalan satu per satu (talaqqi individual). Pendidik menilai kelancaran dan kefasihan bacaan.</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <!-- Langkah 5: Energizer -->
+                            <div class="border border-gray-300 rounded-lg overflow-hidden flex flex-col sm:flex-row">
+                                <div class="bg-[#d94e16] text-white p-3 sm:w-40 flex flex-col justify-center items-center text-center font-bold shrink-0">
+                                    <span class="text-sm">Langkah 5</span>
+                                    <span class="text-base">Energizer</span>
+                                    <span class="text-xs font-normal italic mt-1">2 menit</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="bg-[#fff3e0] text-[#d94e16] font-bold px-3 py-1.5 border-b border-gray-200">
+                                        Aktivitas
+                                    </div>
+                                    <p class="p-3 text-gray-800 bg-white">
+                                        Pendidik mengondisikan kembali peserta didik dengan Tepuk IWR dan Yel-Yel IWR sebelum masuk materi jilid/tilawah.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Langkah 6: Materi Jilid / Tilawah -->
+                            <div class="border border-gray-300 rounded-lg overflow-hidden flex flex-col sm:flex-row">
+                                <div class="bg-[#1976d2] text-white p-3 sm:w-40 flex flex-col justify-center items-center text-center font-bold shrink-0">
+                                    <span class="text-sm">Langkah 6</span>
+                                    <span class="text-base">${materiJilidRph.includes('Jilid') ? 'Materi Jilid' : 'Tilawah & Tajwid'}</span>
+                                    <span class="text-xs font-normal italic mt-1">${durasiIntiBacaan} menit</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="bg-[#e3f2fd] text-[#1976d2] font-bold px-3 py-1.5 border-b border-gray-200">
+                                        Aktivitas
+                                    </div>
+                                    <ol class="list-decimal list-inside p-3 space-y-1.5 text-gray-800 bg-white">
+                                        <li>Peserta didik membaca bersama-sama materi ${materiJilidRph} sebagai pengulangan.</li>
+                                        <li>Pendidik mencontohkan bunyi bacaan pokok materi ${materiJilidRph} sebanyak tiga kali dan diikuti oleh peserta didik.</li>
+                                        <li>Pendidik menjelaskan pokok materi pada kata kunci menjelaskan.</li>
+                                        <li>Pendidik menunjuk peserta didik untuk membaca bacaan sesuai yang ditunjuk oleh pendidik.</li>
+                                        <li>Pendidik membagi peserta didik menjadi beberapa kelompok. Masing-masing kelompok membaca dua baris secara bergantian.</li>
+                                        <li>Seluruh peserta didik membaca bersama-sama satu halaman penuh.</li>
+                                        <li>Pendidik menyimak dan menilai bacaan peserta didik secara individual/bergantian.</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <!-- Langkah 7: Penutup -->
+                            <div class="border border-gray-300 rounded-lg overflow-hidden flex flex-col sm:flex-row">
+                                <div class="bg-[#4a3b32] text-white p-3 sm:w-40 flex flex-col justify-center items-center text-center font-bold shrink-0">
+                                    <span class="text-sm">Langkah 7</span>
+                                    <span class="text-base">Penutup</span>
+                                    <span class="text-xs font-normal italic mt-1">${durasiPenutup} menit</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="bg-[#efebe9] text-[#4a3b32] font-bold px-3 py-1.5 border-b border-gray-200">
+                                        Aktivitas
+                                    </div>
+                                    <ol class="list-decimal list-inside p-3 space-y-1.5 text-gray-800 bg-white">
+                                        <li>Peserta didik membaca bersama-sama materi ${materiZiadahRph} sebagai simpulan hafalan.</li>
+                                        <li>Peserta didik membaca bersama-sama materi pokok ${materiJilidRph} sebagai simpulan materi.</li>
+                                        <li>Pendidik mengarahkan peserta didik untuk membuat jadwal mengulang di rumah bersama orang tua atau anggota keluarga.</li>
+                                        <li>Peserta didik dan pendidik membaca doa kaffaratul majlis bersama-sama.</li>
+                                        <li>Pendidik menutup pembelajaran dengan salam.</li>
+                                    </ol>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
-                    <div>
-                        <h4 class="font-bold text-sm bg-green-100 text-green-900 px-3 py-1.5 rounded mb-3 border-l-4 border-jsit">BAGIAN IV. STANDAR PENILAIAN (RUBRIK IWR BP2Q JSIT)</h4>
+                    <!-- BAGIAN V. PENILAIAN -->
+                    <div class="mb-6">
+                        <h3 class="text-base font-bold text-[#277838] mb-2 flex items-center gap-1">
+                            Bagian V. Penilaian
+                        </h3>
                         <table class="w-full text-xs border-collapse border border-gray-300">
                             <thead>
-                                <tr class="bg-gray-100"><th class="border p-2">Aspek</th><th class="border p-2">Teknik Penilaian</th><th class="border p-2">Instrumen & Indikator</th></tr>
+                                <tr class="bg-[#277838] text-white font-bold">
+                                    <th class="border border-gray-300 p-2 text-left w-1/4">Aspek</th>
+                                    <th class="border border-gray-300 p-2 text-left w-1/3">Teknik Penilaian</th>
+                                    <th class="border border-gray-300 p-2 text-left w-5/12">Instrumen</th>
+                                </tr>
                             </thead>
                             <tbody>
-                                <tr><td class="border p-2 font-semibold">Adab dan Santun</td><td class="border p-2">Observasi langsung & Mutaba'ah</td><td class="border p-2">Buku Prestasi Santun (Skor 1-4: Teladan, Mandiri, Terbimbing, Perlu Bimbingan)</td></tr>
-                                <tr><td class="border p-2 font-semibold">Hafalan (Tahfizh Ziadah & Muroja'ah)</td><td class="border p-2">Tes Lisan Individual (Tasmi')</td><td class="border p-2">Kelancaran, Makhorijul Huruf & Tajwid Presisi (Skor Maks 30)</td></tr>
-                                <tr><td class="border p-2 font-semibold">Bacaan (Jilid/Tilawah)</td><td class="border p-2">Tes Lisan Individual</td><td class="border p-2">Rubrik Jilid/Tilawah (Makhraj, Tajwid, & Kelancaran)</td></tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#eaf3fa] text-gray-900">Adab dan Santun</td>
+                                    <td class="border border-gray-300 p-2">Observasi langsung & penilaian diri</td>
+                                    <td class="border border-gray-300 p-2">Buku prestasi capaian santun / mutaba'ah yang diisi oleh peserta didik setiap akhir pekan dan diparaf orang tua.</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#eaf3fa] text-gray-900">Hafalan</td>
+                                    <td class="border border-gray-300 p-2">Tes lisan (talaqqi / setoran)</td>
+                                    <td class="border border-gray-300 p-2">Peserta didik membaca ${materiZiadahRph} satu per satu. Pendidik menilai kelancaran dan kefasihan bacaan.</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#eaf3fa] text-gray-900">${isSMP ? 'Pemahaman Makna' : 'Kandungan Surat'}</td>
+                                    <td class="border border-gray-300 p-2">Tanya jawab lisan</td>
+                                    <td class="border border-gray-300 p-2">Peserta didik menjawab pertanyaan seputar arti nama surat dan hikmah pesan moralnya.</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold bg-[#eaf3fa] text-gray-900">${isSMP ? 'Tilawah dan Tajwid' : 'Materi Jilid'}</td>
+                                    <td class="border border-gray-300 p-2">Tes lisan individual</td>
+                                    <td class="border border-gray-300 p-2">Pendidik menilai bacaan peserta didik secara bergantian, sebanyak 3–5 peserta didik per pertemuan.</td>
+                                </tr>
                             </tbody>
                         </table>
+                        <p class="text-xs text-gray-700 mt-2 italic leading-relaxed">
+                            <span class="font-bold not-italic">Catatan:</span> Durasi setiap langkah bersifat fleksibel dan dapat disesuaikan dengan kondisi serta tingkat fokus peserta didik di kelas. Pendidik diharapkan mengutamakan suasana belajar yang menyenangkan dan tidak memaksimalkan ketercapaian hafalan secara penuh dalam satu pertemuan.
+                        </p>
                     </div>
 
                     <div class="mt-8 flex justify-between text-xs text-center font-semibold">
